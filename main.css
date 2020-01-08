@@ -1,3 +1,5 @@
+@import url(./generics.css);
+
 .navbar {
     position: sticky;
     top: 0;
@@ -37,7 +39,7 @@
   /* --------------- Hero ---------------- */
   .hero {
     min-height: calc(100vh - 60px);
-    background: url("./images/hero-bcg.jpeg") center/cover no-repeat;
+    background: url("./images/stack.jpg") center/cover no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
