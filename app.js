@@ -59,7 +59,7 @@ class UI{
         buttonsDOM = buttons;
         buttons.forEach(button => {
             let id = button.dataset.id;
-            console.log(id);
+            //console.log(id);
             let inCart = cart.find(item => (item.id === id))
             if (inCart) {
                 button.innerText = "Dentro del carrito";
@@ -79,7 +79,7 @@ class UI{
                     Storage.saveCart(cart);
                     this.setCartValues(cart);
                     this.addCartItem(cartItem);
-                    
+                    this.showCart();
                 });
             }
         })
@@ -114,7 +114,61 @@ class UI{
             </div>
         `;
         cartContent.appendChild(div);
-        console.log(cartContent);
+       // console.log(cartContent);
+    }
+
+    showCart() {
+        cartOverlay.classList.add('transparentBcg');
+        cartDOM.classList.add('showCart');
+    }
+
+    setupAPP() {
+        cart = Storage.getCart();
+        this.setCartValues(cart);
+        this.populateCart(cart);
+        cartBtn.addEventListener('click', this.showCart);
+        closeCartBtn.addEventListener('click', this.hideCart);
+    }
+
+    populateCart(cart) {
+        cart.forEach(item => this.addCartItem(item));
+    }
+
+    hideCart() {
+        cartOverlay.classList.remove('transparentBcg');
+        cartDOM.classList.remove('showCart');
+    }
+
+    cartLogic() {
+        clearCartBtn.addEventListener('click', () =>{
+            this.clearCart();
+        })
+    }
+
+    clearCart() {
+        //console.log(this);
+        let cartItems = cart.map(item => item.id)
+        //console.log(cartItems);
+        cartItems.forEach(id => this.removeItem(id));
+        console.log(cartContent.children);
+        
+        while (cartContent.children.length > 0) {
+            cartContent.removeChild(cartContent.children[0]);
+        }
+        this.hideCart();
+    }
+
+    removeItem(id) {
+        cart= cart.filter(item => item.id !== id);
+        this.setCartValues(cart);
+        Storage.saveCart(cart);
+        let button = this.getSingleButton(id);
+        button.disabled = false;
+        button.innerHTML = `<i class="fas fa-shopping-cart"></i>Agregar al carrito`;
+    }
+
+    getSingleButton(id) {
+        return buttonsDOM.find(button => button.dataset.id === id);
     }
 }
 
@@ -131,16 +185,23 @@ class Storage{
     static saveCart() {
         localStorage.setItem('cart', JSON.stringify(cart));
     }
+
+    static getCart() {
+        return localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')) : [];
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () =>{
     const ui = new UI();
     const products = new Products();
 
+    ui.setupAPP();
+
     products.getProducts().then(products => { 
         ui.displayProducts(products);
         Storage.saveProducts(products);
     }).then(()=>{
         ui.getBagButtons();
+        ui.cartLogic();
     });
 });
