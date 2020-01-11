@@ -105,7 +105,7 @@ class UI{
             <div>
                 <h4>${item.title}</h4>
                 <h5>$ ${item.price}</h5>
-                <span class="remote-item" data-id=${item.id}>Eliminar</span>
+                <span class="remove-item" data-id=${item.id}>Eliminar</span>
             </div>
             <div>
                 <i class="fas fa-chevron-up" data-id=${item.id}></i>
@@ -142,6 +142,39 @@ class UI{
     cartLogic() {
         clearCartBtn.addEventListener('click', () =>{
             this.clearCart();
+        });
+
+        cartContent.addEventListener('click', event =>{
+            //console.log(event.target);
+            if(event.target.classList.contains('remove-item')) {
+                let removeItem = event.target;
+                let id = removeItem.dataset.id;
+                // console.log(removeItem.parentElement.parentElement);
+                cartContent.removeChild(removeItem.parentElement.parentElement);
+                this.removeItem(id);
+            }else if(event.target.classList.contains('fa-chevron-up')) {
+                let addAmount = event.target;
+                let id = addAmount.dataset.id;
+                //console.log(addAmount);
+                let tempItem = cart.find(item => item.id === id);
+                tempItem.amount = tempItem.amount + 1;
+                Storage.saveCart(cart);
+                this.setCartValues(cart);
+                addAmount.nextElementSibling.innerText = tempItem.amount;
+            }else if(event.target.classList.contains('fa-chevron-down')) {
+                let lowerAmount = event.target;
+                let id = lowerAmount.dataset.id;
+                let tempItem = cart.find(item => item.id === id);
+                tempItem.amount = tempItem.amount - 1;
+                if(tempItem.amount > 0) {
+                    Storage.saveCart(cart);
+                    this.setCartValues(cart);
+                    lowerAmount.previousElementSibling.innerText = tempItem.amount;
+                } else {
+                    cartContent.removeChild(lowerAmount.parentElement.parentElement);
+                    this.removeItem(id);
+                }
+            }
         })
     }
 
