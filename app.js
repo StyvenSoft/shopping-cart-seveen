@@ -1,3 +1,9 @@
+const client = contentful.createClient({
+    space: "fef6qwzxxp4a",
+    accessToken: "rgpgx71WPZZtHIAAgR5Pv-PWCZKvh0TJ-ShO2IG5LZk"
+  });
+//console.log(client);
+
 
 const cartBtn = document.querySelector('.cart-btn');
 const closeCartBtn = document.querySelector('.close-cart');
@@ -16,10 +22,15 @@ let buttonsDOM = [];
 class Products{
     async getProducts(){
         try {
-            let result = await fetch("products.json");
-            let data = await result.json();
 
-            let products = data.items;
+            let contentful = await client.getEntries({
+                content_type: 'shoppingCartSeveen'
+            });
+            // console.log(contentful);
+            // let result = await fetch("products.json");
+            // let data = await result.json();
+
+            let products = contentful.items;
             products = products.map(item => {
                 const {title, price} = item.fields;
                 const {id} = item.sys;
@@ -92,7 +103,7 @@ class UI{
             tempTotal += item.price * item.amount;
             itemsTotal += item.amount;
         });
-        cartTotal.innerText = parseFloat(tempTotal.toFixed(2));
+        cartTotal.innerText = parseFloat(tempTotal.toFixed(3));
         cartItems.innerText = itemsTotal;
         //console.log(cartTotal, cartItems); 
     }
@@ -183,7 +194,7 @@ class UI{
         let cartItems = cart.map(item => item.id)
         //console.log(cartItems);
         cartItems.forEach(id => this.removeItem(id));
-        console.log(cartContent.children);
+        //console.log(cartContent.children);
         
         while (cartContent.children.length > 0) {
             cartContent.removeChild(cartContent.children[0]);
